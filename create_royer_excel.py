@@ -108,7 +108,7 @@ for x in range(1,len(df_formulario.axes[0])):
       blanco1 = "---"
       cronicas_beneficiadas = df_formulario.iloc[x][46]
       blanco2 = "---"
-      total_beneficiadas = None #no estoy segura como sale IGUAL AL NUMERO DE RACIONES.
+      total_beneficiadas = df_formulario.iloc[x][37] 
       blanco3 = df_formulario.iloc[x][68]
       blanco4 = df_formulario.iloc[x][70]
       blanco5 = df_formulario.iloc[x][71]

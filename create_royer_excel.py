@@ -4,52 +4,14 @@ import requests
 # import urllib
 from bs4 import BeautifulSoup as bs
 from datetime import datetime
-#Tratar de descargar un excel desde una página web:
-#webscrapping
-#el problema con python es que no lee javascript y usualmente los archivos de excel o adicionales estan relacionados a javascript,
-#lo que hace el codigo es parsear el html y extraer el ".xls" que este en la página web
 
-# def get_soup(url):
-#     response = requests.get(url)
-#     #print(response.status_code)
-#     #print(response.text)
-#     html = response.text
-#     soup = bs(html, 'html.parser')
-#     #soup = bs(html, 'lxml')
-#     #soup = bs(html, 'html5lib')
-#     return soup
-
-# DOMAIN = 'https://lfportal.loudoun.gov/LFPortalinternet/'
-# URL = 'https://lfportal.loudoun.gov/LFPortalinternet/Browse.aspx?startid=213973&row=1&dbid=0'
-# FILETYPE = '.xls'
-
-# soup = get_soup(URL)
-# for folder_link in soup.find_all('a', {'class': 'DocumentBrowserNameLink'}):
-#     folder_name = folder_link.get('aria-label').split(' ')[0]
-#     folder_link = folder_link.get('href')
-
-#     print('folder:', folder_name)
-#     os.makedirs(folder_name, exist_ok=True)
-    
-#     subsoup = get_soup(DOMAIN + folder_link)
-#     for file_link in subsoup.find_all('a', {'class': 'DocumentBrowserNameLink'}):
-#         file_name = file_link.get('aria-label')[:-4] 
-#         file_link = file_link.get('href')
-        
-#         if file_link.endswith(FILETYPE):
-#             print('  file:', file_name)
-#             file_name = os.path.join(folder_name, file_name)
-#             with open(file_name, 'wb') as file:
-#                 response = requests.get(DOMAIN + file_link)
-#                 file.write(response.content)
-
-#abrir data localmente
+#0abrir data localmente
 df_formulario = pd.read_excel (
       os.path.join("C:/Users/avill/Downloads","UP Ollas Comunes - Municipalidad de Lima (Respuestas).xlsx"),
       engine='openpyxl',
  )
 #print(df_formulario)
-#tiene 158 filas y 71 columnas
+
 df_royer = pd.read_excel (
       os.path.join("C:/Users/avill/Downloads","Para Royer 22.09.xlsx"),
       engine='openpyxl',
@@ -61,13 +23,16 @@ df_formulario = df_formulario.dropna(subset=[69])
 df_formulario = df_formulario.dropna(subset=[70]) 
 df_formulario = df_formulario.dropna(subset=[71]) 
 
-#quedan 63 filas, identificador celular, buscar valores diferentes y crear df que solo tenga estos valores
+#eliminar celulares duplicados (elimina los primeros duplicados, se mantiene con el ultimo celular duplicado que se agregó en el excel del formulario)
+df_formulario.drop_duplicates(keep='last', subset=[11], inplace=True)
+
+#identificador celular, buscar valores diferentes y crear df que solo tenga estos valores
 #columna en formulario: 11, royer: 13
 df_formulario = df_formulario.dropna(subset=[11]) 
 
 for y in df_formulario[11]:
       if y in set(df_royer[13]):
-            df_formulario.drop(df_formulario.loc[df_formulario[11]==y].index, inplace=True) #doble checkear esto
+            df_formulario.drop(df_formulario.loc[df_formulario[11]==y].index, inplace=True) 
 
 #guardar en un dataframe distinto las ollas desactivadas (columna 35 = 3):
 df_royer_desactivadas = df_royer[df_royer['Unnamed: 34'] == 3]
@@ -256,6 +221,7 @@ for x in range(1,len(df_formulario.axes[0])):
             updated_at,
             'NaN', #cambiar a 2 o 3,  depende de la base madre
       ] 
+      
 #Agregar las ollas desactivadas:
 df_royer = df_royer.append(df_royer_desactivadas,ignore_index=True)
 # print(df_formulario)

@@ -4,6 +4,11 @@ import requests
 # import urllib
 from bs4 import BeautifulSoup as bs
 from datetime import datetime
+#hay un warning para openpxl que eliminamos con esta libreria
+#otra posible forma de evitar que aparezca un warning es que cierres el excel de llamadas y corras de nuevo el codigo (aun por probar)
+import warnings
+import numpy as np
+warnings.simplefilter("ignore")
 
 #0abrir data localmente
 df_formulario = pd.read_excel (
@@ -16,6 +21,64 @@ df_royer = pd.read_excel (
       os.path.join("C:/Users/avill/Downloads","Para Royer 22.09.xlsx"),
       engine='openpyxl',
  )
+
+# df_llamadas1 = pd.read_excel (
+#       os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022"),                  
+#       engine='openpyxl', sheetname='1era semana'
+# )
+
+df_llamadas2 = pd.read_excel (
+      os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022.xlsx"),                  
+      engine='openpyxl', sheet_name='2da semana'
+)
+
+df_llamadas3 = pd.read_excel (
+      os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022.xlsx"),                  
+      engine='openpyxl', sheet_name='3ra semana'
+)
+
+df_llamadas4 = pd.read_excel (
+      os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022.xlsx"),                  
+      engine='openpyxl', sheet_name='4ta semana'
+)
+
+df_llamadas5 = pd.read_excel (
+      os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022.xlsx"),                  
+      engine='openpyxl', sheet_name='5ta semana'
+)
+
+df_llamadas6 = pd.read_excel (
+      os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022.xlsx"),                  
+      engine='openpyxl', sheet_name='6ta semana'
+)
+
+df_llamadas7 = pd.read_excel (
+      os.path.join("C:/Users/avill/Downloads","llamadas UP agosto 2022.xlsx"),                  
+      engine='openpyxl', sheet_name='rezagados'
+)
+
+#ubicar que celulares han sido inactivos en las 1-6 semanas del mes primero, crear una lista con estos numeros:
+
+df_llamadas2 = df_llamadas2.loc[df_llamadas2['Estado de la llamada'] == 'Inactiva']
+df_llamadas2['Celular de contacto principal'] = df_llamadas2['Celular de contacto principal'].astype('int')
+df_llamadas3 = df_llamadas3.loc[df_llamadas3['Estado de la llamada'] == 'Inactiva']
+df_llamadas3['Celular de contacto principal'] = df_llamadas3['Celular de contacto principal'].astype('int')
+df_llamadas4 = df_llamadas4.loc[df_llamadas4['Estado de la llamada'] == 'Inactiva']
+df_llamadas4['Celular de contacto principal'] = df_llamadas4['Celular de contacto principal'].astype('int')
+df_llamadas5 = df_llamadas5.loc[df_llamadas5['Estado de la llamada'] == 'Inactiva']
+df_llamadas5['Celular de contacto principal'] = df_llamadas5['Celular de contacto principal'].astype('int')
+df_llamadas6 = df_llamadas6.loc[df_llamadas6['Estado de la llamada'] == 'Inactiva']
+df_llamadas6['Celular de contacto principal'] = df_llamadas6['Celular de contacto principal'].astype('int')
+df_llamadas7 = df_llamadas7.loc[df_llamadas7['Estado de la llamada'] == 'Inactiva']
+df_llamadas7['Celular de contacto principal'] = df_llamadas7['Celular de contacto principal'].astype('int')
+celulares_inactivos = list(set(df_llamadas2['Celular de contacto principal']) ) + list(set(df_llamadas3['Celular de contacto principal'])) + list(set(df_llamadas4['Celular de contacto principal'])) + list(set(df_llamadas5['Celular de contacto principal'])) + list(set(df_llamadas6['Celular de contacto principal'])) + list(set(df_llamadas7['Celular de contacto principal']))
+
+#de la lista de celulares inactivos, eliminarlos del dataframe de la base de royer:
+for y in df_royer[13]:
+      if y in celulares_inactivos:
+            df_royer.drop(df_royer.loc[df_royer[13]==y].index, inplace=True) 
+
+# print(set(df_llamadas2[5]))
 # print(df_royer)
 #filtrar solamente los que tengan i)link de fotos, ii)link de ubicación, iii)coordenadas
 df_formulario = df_formulario.dropna(subset=[68]) 
@@ -36,6 +99,97 @@ for y in df_formulario[11]:
 
 #guardar en un dataframe distinto las ollas desactivadas (columna 35 = 3):
 df_royer_desactivadas = df_royer[df_royer['Unnamed: 34'] == 3]
+#agregar nuevos numeros inactivos no repetidos a este dataframe: 
+for y in celulares_inactivos:
+      if y not in set(df_royer_desactivadas[13]):
+            df_royer_desactivadas.loc[len(df_royer_desactivadas.index)] = [np.nan,
+            np.nan,
+            np.nan,
+            np.nan, 
+            np.nan, 
+            np.nan,
+            np.nan, 
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            y,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            3,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+      ] 
 
 #transcribir los valores nuevos al excel de royer
 #crear lista con valores en el orden deseado y ordenar los valores necesarios:
@@ -219,9 +373,9 @@ for x in range(1,len(df_formulario.axes[0])):
             tipo_aplicativos,
             blanco14,
             updated_at,
-            'NaN', #cambiar a 2 o 3,  depende de la base madre
+            2, 
       ] 
-      
+
 #Agregar las ollas desactivadas:
 df_royer = df_royer.append(df_royer_desactivadas,ignore_index=True)
 # print(df_formulario)
@@ -232,3 +386,6 @@ writer.save()
 writer = pd.ExcelWriter('converted-to-excel-formulario.xlsx')
 df_formulario.to_excel(writer)
 writer.save()
+# writer = pd.ExcelWriter('converted-to-excel-llamadas.xlsx')
+# df_llamadas2.to_excel(writer)
+# writer.save()
